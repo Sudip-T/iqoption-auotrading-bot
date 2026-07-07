@@ -67,7 +67,7 @@ class TradingBot:
         
         # Subscribe to 1-minute candles (or use self.config.expiry_minutes * 60 for timeframe)
         success = self.client.start_candle_stream(
-            asset="EURUSD-op",
+            asset=self.config.asset,
             candle_size=60  # 1-minute candles
         )
         

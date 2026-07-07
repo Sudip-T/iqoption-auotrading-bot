@@ -369,6 +369,7 @@ class CandleSubscriptionManager:
         
         # FIXED: Get asset name from ID using id_to_name
         asset_name = self.id_to_name.get(asset_id)
+
         if not asset_name:
             logger.warning(f"Unknown asset_id: {asset_id}")
             return
