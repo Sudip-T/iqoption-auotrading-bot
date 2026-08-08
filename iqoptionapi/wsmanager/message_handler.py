@@ -274,5 +274,6 @@ class MessageHandler:
         Handle candle-generated messages.
         DOES NOTHING except forward to candle manager.
         """
+        # print(message)
         if self.candle_manager:
             self.candle_manager.on_candle_message(message)

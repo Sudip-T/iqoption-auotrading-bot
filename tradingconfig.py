@@ -1,12 +1,25 @@
 import logging
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List, Optional
 from dataclasses import dataclass
 from iqoptionapi.models import OptionType
 
 logger = logging.getLogger(__name__)
 
+@dataclass
+class PairConfig:
+    """Per-pair trading settings."""
+    asset: str                                    # e.g. "EURUSD-op"
+    expiry: int = 1
+    enabled: bool = True
+    candle_timeframe: int = 60        # seconds, for subscription
+    option_type: str = OptionType.BINARY_OPTION
 
+    @property
+    def candle_asset(self) -> str:
+        return self.asset
+
+    
 @dataclass
 class TradingConfig:
     """
@@ -16,11 +29,38 @@ class TradingConfig:
     
     # ═══════════════════════════════════════════════════════════════════════
     #  TRADING SETTINGS
-    # ═══════════════════════════════════════════════════════════════════════
-    asset: str = "EURUSD-op"                    # Trading asset
-    expiry_minutes: int = 1                      # Trade expiry (1, 2, 5, 10, 15 minutes)
-    option_type: str = OptionType.BINARY_OPTION  # 'binary' or 'digital'
+    pairs: Tuple[PairConfig, ...] = (
+        # PairConfig(asset="EURUSD-op", enabled=True),
+        # PairConfig(asset="EURGBP-op", enabled=True),
+        # PairConfig(asset="EURAUD-op", enabled=True),
+        # PairConfig(asset="EURCAD-op", enabled=True),
+        # PairConfig(asset="EURJPY-op", enabled=True),
+        # PairConfig(asset="USDJPY-op", enabled=True),
+        # PairConfig(asset="GBPCAD-op", enabled=True),
+        # PairConfig(asset="GBPAUD-op", enabled=True),
+        # PairConfig(asset="GBPJPY-op", enabled=True),
+        # PairConfig(asset="GBPUSD-op", enabled=True),
+        # PairConfig(asset="AUDCAD-op", enabled=True),
+        # PairConfig(asset="CADCHF-op", enabled=True),
+        # PairConfig(asset="USDCAD-op", enabled=True),
+
+        PairConfig(asset="ETHUSD-OTC", enabled=True),
+        # PairConfig(asset="HBARUSD-OTC", enabled=True),
+        # PairConfig(asset="FLOKIUSD-OTC", enabled=True),
+        PairConfig(asset="EURUSD-OTC", enabled=True),
+    )
+
+    @property
+    def active_pairs(self) -> List[PairConfig]:
+        """Only enabled pairs."""
+        return [p for p in self.pairs if p.enabled]
     
+    def get_pair(self, asset: str) -> Optional[PairConfig]:
+        """Look up a pair by asset name (handles -op suffix)."""
+        for pair in self.pairs:
+            if pair.asset == asset or pair.candle_asset == asset:
+                return pair
+        return None
     # ═══════════════════════════════════════════════════════════════════════
     #  TIMING SETTINGS
     # ═══════════════════════════════════════════════════════════════════════
@@ -58,16 +98,9 @@ class TradingConfig:
         """Validate all configuration settings"""
         
         # ── Trading Settings Validation ────────────────────────────────────
-        if not self.asset:
-            raise ValueError("Asset cannot be empty")
         
         if self.min_trade_amount < 1:
             raise ValueError(f"Trade amount must be at least $1, got ${self.min_trade_amount}")
-        
-        valid_expiries = [1, 2, 5, 10, 15]
-        if self.expiry_minutes not in valid_expiries:
-            logger.warning(f"Expiry {self.expiry_minutes} min may not be available. "
-                          f"Valid: {valid_expiries}")
         
         # ── Risk Management Validation ─────────────────────────────────────
         if self.risk_per_trade <= 0 or self.risk_per_trade > 10:
@@ -102,13 +135,6 @@ class TradingConfig:
         logger.info("="*50)
         logger.info("📊 TRADING CONFIGURATION")
         logger.info("="*50)
-        
-        logger.info("📈 TRADING SETTINGS:")
-        logger.info(f"  Asset:           {self.asset}")
-        logger.info(f"  Expiry:          {self.expiry_minutes} minute(s)")
-        logger.info(f"  Option Type:     {self.option_type.value.capitalize()}")
-        logger.info(f"  Trade Seconds:   {self.trade_seconds}")
-        logger.info(f"  Duration:        {self.duration_minutes} minutes")
         
         logger.info("-"*40)
         logger.info("🛡️ RISK MANAGEMENT:")

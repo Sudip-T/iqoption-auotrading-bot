@@ -1,0 +1,2 @@
+Bot started at: 2026-08-08 15:14:15.037275
+Log file: C:\Users\sudip\OneDrive\Desktop\bytecode'a\iqoption-auotrading-bot\logs\trading_bot_20260808_151415.log
