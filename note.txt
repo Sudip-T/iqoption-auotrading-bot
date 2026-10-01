@@ -1,0 +1,11 @@
+Setup
+
+Open FileZilla and go to File → Site Manager → New Site.
+Fill in:
+Protocol: SFTP - SSH File Transfer Protocol
+Host: 143.198.197.32
+Port: 22 (or leave blank)
+Logon Type: Key file
+User: root
+Key file: browse to C:\Users\sudip\.ssh\id_ed25519 (type it)
+Click Connect.
