@@ -5,10 +5,11 @@ git checkout -b feature/new-update   ==>  Create and switch to new branch
 git branch feature/new-update        ==>  Or create without switching
 git checkout feature/new-update   ===>  Then switch to it
 
+To delete branch
+- switch to another branch - git checkout main & then git branch -d/-D branch_name
 
 git push -u origin feature/new-update    => First push (set upstream)
 git push  ==>  Subsequent pushes
-
 
 git checkout main  ===> Make sure you're on main/master
 git pull origin main    ===> Pull latest changes

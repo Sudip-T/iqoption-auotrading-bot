@@ -50,6 +50,7 @@ class IQOptionClient:
         self.session = requests.Session()
 
         self.subscribe_candle = []
+        self.trader_mood = []
         
         # Initialize core components
         self._init_components()
@@ -515,4 +516,26 @@ class IQOptionClient:
         self.candle_manager.on_live_candle_update(callback)
 
 
+    # -----------------traders_mood----------------------
+    def subscribe_traders_mood(self, ASSET, timeout: float = 5.0):
+        if ASSET in self.trader_mood == False:
+            self.trader_mood.append(ASSET)
 
+        return self.market_manager.stream_traders_mood(ASSET)
+
+    def unsubscribe_traders_mood(self, ASSET):
+        if ASSET in self.trader_mood == True:
+            del self.trader_mood[ASSET]
+
+        self.market_manager.stop_traders_mood(ASSET)
+
+    def get_traders_mood(self, ASSET):
+        # return highter %
+        try:
+            return self.message_handler.traders_mood[get_asset_id(ASSET)]
+        except Exception as e:
+            return f'Something went wrong! Reason: {e}'
+
+    def get_all_traders_mood(self):
+        # return highter %
+        return self.message_handler.traders_mood

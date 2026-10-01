@@ -34,6 +34,7 @@ class MessageHandler:
         self.initialization_data = None
         self.hisory_positions = None
         self.position_info = {}
+        self.traders_mood = {}
         self.orders_confirmation = {}
         self.trade_outcome_checker = TradeOutcomeChecker()
 
@@ -98,6 +99,7 @@ class MessageHandler:
             "socket-option-closed":self._handle_socket_option_closed,
             "candle-generated":self._handle_candles_generated,
             # "candle-generated": self._on_candle,
+            "traders-mood-changed":self._handle_traders_mood_changed,
         }
 
         # Get the appropriate handler and invoke it if found
@@ -274,6 +276,8 @@ class MessageHandler:
         Handle candle-generated messages.
         DOES NOTHING except forward to candle manager.
         """
-        # print(message)
         if self.candle_manager:
             self.candle_manager.on_candle_message(message)
+
+    def _handle_traders_mood_changed(self, message: dict):
+        self.traders_mood[message["msg"]["asset_id"]]=message["msg"]["value"]
