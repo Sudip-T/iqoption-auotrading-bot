@@ -3,6 +3,7 @@ import sys
 import time
 import logging
 import requests
+import threading
 from dotenv import load_dotenv
 from typing import Optional, List, Callable
 
@@ -366,6 +367,45 @@ class IQOptionClient:
         self._ensure_connected()
         return self.candle_manager.unsubscribe(asset, candle_size)
 
+    def subscribe_live_candles(self, actives) -> bool:
+        """Subscribe to all active actives and register the candle callback."""
+
+        results: dict[str, bool] = {}
+        threads = []
+
+        def subscribe_one(active):
+            results[active.asset] = self.candle_manager.subscribe(
+                active.candle_asset,
+                timeframe=active.candle_timeframe,
+            )
+
+        for i, active in enumerate(actives):
+            # Add delay before each subscription (except first)
+            if i > 0:
+                time.sleep(0.5)  # 200ms delay
+
+            t = threading.Thread(target=subscribe_one, args=(active,), daemon=True)
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        # failed = [a for a, ok in results.items() if not ok]
+        # success = [a for a, ok in results.items() if ok]
+
+        failed, success = [], []
+        for asset, ok in results.items():
+            (success if ok else failed).append(asset)
+
+        if failed:
+            logger.error("Failed to subscribe: %s", failed)
+
+        # self.on_new_candle(self.on_new_candle)
+        self._running = True
+        return len(success) > 0
+    
+
     def get_current_price(self, asset: str, timeframe: int = 60) -> Optional[float]:
         """
         Get current price for an asset using cached candle data.
@@ -473,3 +513,6 @@ class IQOptionClient:
             client.on_live_candle_update(on_update)
         """
         self.candle_manager.on_live_candle_update(callback)
+
+
+

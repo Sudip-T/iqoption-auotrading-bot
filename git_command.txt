@@ -1,0 +1,72 @@
+git branch # Shows all local branches, * indicates current branch
+
+
+git checkout -b feature/new-update   ==>  Create and switch to new branch
+git branch feature/new-update        ==>  Or create without switching
+git checkout feature/new-update   ===>  Then switch to it
+
+
+git push -u origin feature/new-update    => First push (set upstream)
+git push  ==>  Subsequent pushes
+
+
+git checkout main  ===> Make sure you're on main/master
+git pull origin main    ===> Pull latest changes
+git checkout -b update/version-2.0-risk-management    ===> Create and switch to new branch
+
+# 4. Make your changes
+# Edit files, add new code, etc.
+
+
+git status   ===> Check status
+
+
+git add . or git add demo.py iqoptionapi/  ==> Stage changes
+git commit -m "✨ Add risk management features
+- Add daily loss limit ($30)
+- Add profit target ($120)
+- Fix latency issues
+- Add trend detection filter"
+
+
+git push -u origin update/version-2.0-risk-management    ====> Push to remote
+
+
+
+
+
+# View all branches (local)
+git branch
+
+# View all branches (remote)
+git branch -r
+
+# View all branches (local + remote)
+git branch -a
+
+# Switch to branch
+git checkout branch-name
+
+# Switch to branch (newer syntax)
+git switch branch-name
+
+# Delete local branch
+git branch -d branch-name
+
+# Delete remote branch
+git push origin --delete branch-name
+
+# Rename current branch
+git branch -m new-branch-name
+
+# Pull latest from specific branch
+git pull origin branch-name
+
+# Merge branch into current
+git merge branch-name
+
+# See commits
+git log --oneline
+
+# See changes
+git diff
